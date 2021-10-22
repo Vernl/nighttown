@@ -1,0 +1,24 @@
+# 導入pandas
+import pandas as pd
+
+# 讀取csv文件
+df2019= pd.read_csv("/Users/Lily/2019年下半年订单表.csv")
+df2020= pd.read_csv("/Users/Lily/2020年上半年订单表.csv")
+
+# 縱向合併df2019和df2020兩份文件
+dfYear= pd.concat([df2019,df2020])
+
+### 轉換、設置為新索引 ###
+# 用 .to_datetime 將 "下單時間" 的字符類型轉換成時間類型
+dfYear["下單時間"]= pd.to_datetime(dfYear["下單時間"])
+# 設置成新的索引並賦值 dfnewYear
+dfnewYear = dfYear.set_index("下單時間")
+
+### 分組、重新抽樣（"M"是按月採樣）、計算訂單數量 ###
+# 用groupby()函數，將「订单数据表」按「商品ID」進行分組，「按月采样」计算出订单「数量」的和并赋值给dfSales
+dfSales = dfnewYear["数量"].groupby(dfnewYear["商品ID"]).resample("M").sum()
+
+# TODO 还原dfSales的索引index并赋值给dfnewSales
+dfnewSales = dfSales.reset_index()
+# 打印输出dfnewSales
+print(dfnewSales)
